@@ -12,17 +12,24 @@ int currentBit1;
 int voltageBit2;
 int currentBit2;
 
-float realVoltage;
-float realCurrent;
+float realVoltage1;
+float realCurrent1;
+float realVoltage2;
+float realCurrent2;
 
 float voltageScaling = 15.78; 
 float currentVOffset = 0.0917;
 float currentVscaling = 0.9362; 
 
-void readParameters() {
+void readADC(){
+  
+
+}
+void readTeensy(){
 
 
-
+  
+}
 }
 void setup() {
   Serial.begin(9600);
