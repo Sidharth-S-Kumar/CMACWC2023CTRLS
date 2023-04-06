@@ -6,9 +6,8 @@
 //State 4: When current is 0, stroke goes to zero only in state 2. Return to previous stroke. (No-Load)
 //State 4 alternative: When voltage reached a maximum threshhold, stroke goes to zero only in state 2
 
-#include <Servo.h>
 
-Servo actuator;
+
 
 //Constants
 const int currentPin = 16; //pin for current sensor

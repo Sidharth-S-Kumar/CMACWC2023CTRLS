@@ -1,10 +1,12 @@
 
+
   #include <Arduino.h>
   #include <Wire.h>
   #include <Adafruit_MCP4725.h>
   #include <Adafruit_ADS1X15.h>
   #include <SD.h>
   #include <SPI.h>
+
 
 
 // Pin Define 
@@ -78,7 +80,7 @@ void readADCParams(){
 float setPoint = 0;
 float err;
 float errPrev = 0;
-float errSum = 0l;
+float errSum = 0;
 int state = 0; 
 float modePrevious; 
 int dacOutput = 0; 

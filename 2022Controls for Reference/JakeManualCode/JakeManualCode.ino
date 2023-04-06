@@ -21,6 +21,7 @@ int manual_Stroke; // manually set70ting stroke
 void setup() {
   Serial.begin(9600);
   actuator.attach(actuator_Pin);
+  dac1.
 }
 
 void set_Stroke(float stroke_percent) //setting stroke from 0-100 (no stroke to full stroke)
