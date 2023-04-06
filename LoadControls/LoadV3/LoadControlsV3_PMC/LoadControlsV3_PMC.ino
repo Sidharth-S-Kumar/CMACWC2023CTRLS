@@ -23,7 +23,7 @@ unsigned long messageClock = 0; //Message Trigger Clock
 //Analog I/O Globals
 float res_divider = 0.28057; //Internal Voltage Divider
 float reference = 3.3; //3.3 Volt Reference System
-float vBus, iBus,pBus; //Global Variable for Voltage and Current
+float vBus,iBus,pBus,rBus; //Global Variable for Voltage and Current
 float busRes_divider = .2029; //External Voltage Divider
 float iConversion = 0.9363; //Converting from Volts to Amps
 float n = 200; //Sampling for Averaging function
@@ -57,6 +57,7 @@ void readParams(){ // Read Analog Control Parameters
     float vSum, iSum = 0; 
     float raw_voltage_ch0,raw_voltage_ch1; 
     float voltage_ch0,voltage_ch1; 
+
     for (int i = 0; i<n;i++){
       raw_voltage_ch0 = analog_in.read(0);
       float voltage_ch0 = (raw_voltage_ch0 * reference) / 65535 / res_divider / busRes_divider;
@@ -69,6 +70,7 @@ void readParams(){ // Read Analog Control Parameters
       vBus = vSum/(float)n; 
       iBus = iSum/(float)n; 
       pBus = vBus*iBus;
+      rBus = vBus/iBus; 
     if((tikTok-messageClock)>1000){
         Serial.print("Bus V: ");
         Serial.println(vBus,4);
