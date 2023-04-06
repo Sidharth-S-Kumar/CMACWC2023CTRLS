@@ -1,9 +1,12 @@
 
+
+  #include <Arduino.h>
+  #include <Wire.h>
   #include <Adafruit_MCP4725.h>
   #include <Adafruit_ADS1X15.h>
   #include <SD.h>
+  #include <SPI.h>
 
-  #include <parameterRead.h>
 
 
 // Pin Define 
@@ -17,7 +20,6 @@
 //Create I2C Device Objects 
 Adafruit_ADS1115 adc1;  // Construct an ads1115 
 Adafruit_MCP4725 dac1; // Construct an MCP4725
-
 //General Clock Globals 
 unsigned long clock = millis(); //Clock Reference 
 unsigned long previousTime = 0; //Control Law Clock
@@ -30,6 +32,7 @@ float resLocal, resADC; //Resistance by source
 float voltageScaling = 15.78;  //Scaling Factor for Voltage
 float currentVOffset = 0.0917; //Offset on Current Measurement
 float currentVscaling = 0.9362; //Scaling factor from voltage to current. 
+
 
 //Type Defining IORead as a Struct
 typedef struct{
@@ -60,12 +63,15 @@ void readADCParams(){
   //ReadADCAnalogPins
   int voltageBitADC = adc1.readADC_SingleEnded(adcVoltagePin);
   int currentBitADC = adc1.readADC_SingleEnded(adcCurrentPin); 
-  //Convert 16Bit to V & I 
-  vADC = (float)((voltageBitADC/65536.00)*5.00*voltageScaling); 
-  iADC = (float)((((currentBitADC/65536.00)*5.00)-currentVOffset)/currentVscaling);
+  float _vADC = adc1.computeVolts(voltageBitADC);
+  float _iADC = adc1.computeVolts(currentBitADC);
+
+  //Convert to actual V & I;
+  vADC = (float)(_vADC*voltageScaling); 
+  iADC = (float)((_iADC-currentVOffset)/currentVscaling);
   resADC  = vADC/iADC; 
   adcIO = {vADC,iADC,resADC};
-  //Serial.println(adcIO);
+  
 
 }
 //Control Laws

@@ -1,16 +1,21 @@
-/*
-  Morse.cpp - Library for flashing Morse code.
-  Created by David A. Mellis, November 2, 2007.
-  Released into the public domain.
-*/
 
-#include "Arduino.h"
-#include "parameterRead.h"
+/*#include <parameterRead.h>
+#include <Arduino.h>
+#include <Adafruit_MCP4725.h>
+#include <Adafruit_ADS1X15.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <SD.h>
 
-parameterRead::parameterRead(int pin)
-{
-  pinMode(pin, OUTPUT);
-  _pin = pin;
+Adafruit_ADS1115 adc1;  // Construct an ads1115 
+
+
+parameterRead::parameterRead(int vLocalpin, int iLocalpin,int adcI2C,int adcPin)
+{ 
+  adc1.begin(adcI2C);
+  const int _vLocal = vLocal; 
+   
+  
 }
 
 void parameterRead::dot()
@@ -27,4 +32,4 @@ void parameterRead::dash()
   delay(1000);
   digitalWrite(_pin, LOW);
   delay(250);
-}
+}*/
