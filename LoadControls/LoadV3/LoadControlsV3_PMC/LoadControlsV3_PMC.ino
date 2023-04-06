@@ -174,6 +174,14 @@ void setup() {
 void loop() {
   //mppt(vBus,iBus);
   readParams();
+  if (Serial.available() > 0) {
+    setPoint =  Serial.parseFloat();
+    Serial.print("Setpoint:");
+    Serial.println(setPoint); //write setpoint to serial monitor
+  }
+
   ctrlLaw(setPoint,iBus);
+
+
 
 }
