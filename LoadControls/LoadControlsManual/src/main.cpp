@@ -74,7 +74,7 @@ void readADCParams(){
 float setPoint = 0;
 float err;
 float errPrev = 0;
-float errSum = 0l;
+float errSum = 0;
 int state = 0; 
 float modePrevious; 
 int dacOutput = 0; 
