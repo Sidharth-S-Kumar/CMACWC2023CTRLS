@@ -7,6 +7,7 @@ using namespace machinecontrol;
 
 
 
+
 // Pin Definition
 #define vBus_Pin 0
 #define iBus_Pin 1
@@ -35,14 +36,15 @@ float errPrev = 0;
 float errSum = 0;
 float errMin = -10000; 
 float errMax = +10000; 
-int state = 0; 
-float modePrevious; 
-float measuredVar;
+float outPut =0.25; 
+float outMax = 10.4; 
+float outMin = 2.25; 
+
 
 // PID Gains
-float Kp =0;
-float Kd =0;
-float Ki =0;
+float Kp =0.1;
+float Kd =0.1;
+float Ki =0.1;
 
 //MPPT Globals
 float vPrev = 0; 
@@ -82,7 +84,7 @@ void readParams(){ // Read Analog Control Parameters
     }
 }
 
-float ctrlLaw(float sP, float mV){
+void ctrlLaw(float sP, float mV){
 
   float dt = (float)(tikTok-previousTime)/1000.00; //time increment dt
   err = sP - mV;
@@ -101,10 +103,16 @@ float ctrlLaw(float sP, float mV){
   errPrev = err;
 
   previousTime =tikTok; 
+  
+  outPut =  (10.4-(P+I+D))+outPut;
+  outPut = constrain(outPut,outMax,outMin);
 
-  float outPut = constrain((P+I+D),10,0);
+}
 
-  return outPut; 
+void gateVoltage(float comm){
+  analog_out.write(0, comm);
+
+
 
 }
 
@@ -179,8 +187,10 @@ void loop() {
     Serial.print("Setpoint:");
     Serial.println(setPoint); //write setpoint to serial monitor
   }
+  ctrlLaw(setPoint, rBus);
+  float command = outPut;
+  gateVoltage(command);
 
-  ctrlLaw(setPoint,iBus);
 
 
 
