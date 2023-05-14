@@ -25,8 +25,9 @@ float setPoint=0;
 float dV,dI; 
 float vBus_Last = 0; 
 float iBus_Last = 0; 
-float delta = .025;
-float MPPT_Targ = 2.50; 
+float delta = .005;
+float MPPT_Targ = 3.75; 
+float min_Gate = 3.75; 
 float hold;
 float absHold; 
 
@@ -118,7 +119,7 @@ void MPPT(){
  Serial.print("DI:");
  Serial.println(dI);*/
  
-if((millis()-depressionClock)>250){
+if((millis()-depressionClock)>1000){
 if(dV=0){
     if(dI=0){
       //do Nothing; 
@@ -173,7 +174,8 @@ else{
   depressionClock = millis(); 
   }
 }
-outPut=constrain(MPPT_Targ,2.35,10.4); 
+outPut=constrain(MPPT_Targ,3.65,10.4); 
+
 vBus_Last = vBus; 
 iBus_Last = iBus; 
 
@@ -244,30 +246,22 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   readParams();
-  MPPT();
+  //MPPT();
   writeParams();
-  
+  //analog_out.write(0,outPut);
 
-
-  /*if (Serial.available() > 0) {
-    setPoint =  Serial.parseFloat();
-    Serial.print("Setpoint:");
-    Serial.println(setPoint); //write setpoint to serial monitor
-  }
-
-  controlLaw2(setPoint,iBus);*/
-  analog_out.write(0,outPut);
-
-  /*switch(state) {
+  switch(state) {
   case 0:
-    if(vBus>3.3){
+    if(vBus>15){
       state = 1; 
-      analog_out.write(0,2.3);
-      Serial.println("Out of StartUp State");
+      analog_out.write(0,3.5);
+      Serial.println("Out of Start Up State");
     }
     //Serial.println("Start Up State");
     break;
   case 1: // MPPT
+    MPPT();
+    analog_out.write(0,outPut);
     // code block
     break;
   case 2: //Rated Power
@@ -277,8 +271,8 @@ void loop() {
     break; 
   case 4: //BackFeed 
   
-    break;*/
-  
+   break;
+  }
 }
 
 
