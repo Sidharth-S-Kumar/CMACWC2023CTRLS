@@ -6,6 +6,7 @@ using namespace machinecontrol;
 unsigned long previousClock = 0; //Control Law Clock
 unsigned long messageClock = 0; //Message Trigger Clock
 unsigned long depressionClock = 0; 
+unsigned long backfeedClock = 0;
 int state =0; 
 //ControlLaw Params 
 unsigned long currentClock; 
@@ -26,8 +27,8 @@ float dV,dI;
 float vBus_Last = 0; 
 float iBus_Last = 0; 
 float delta = .005;
-float MPPT_Targ = 3.75; 
-float min_Gate = 3.75; 
+float MPPT_Targ = 2.65; 
+float min_Gate = 2.65; 
 float hold;
 float absHold; 
 
@@ -97,19 +98,7 @@ float vSum, iSum = 0;
   
 }*/
 
-void controlLaw2(float sP, float mV){
-  if((millis()-depressionClock)>1000){
-    Serial.println(sP-mV);
-  if((sP-mV)>0){
-    outPut+=.01; 
-  }
-  else{
-    outPut -= .01; 
-  }
-  Serial.println(outPut);
-  depressionClock = millis();
-  }
-}
+
 
 void MPPT(){
  dV = (vBus - vBus_Last);
@@ -119,7 +108,7 @@ void MPPT(){
  Serial.print("DI:");
  Serial.println(dI);*/
  
-if((millis()-depressionClock)>1000){
+if((millis()-depressionClock)>850){
 if(dV=0){
     if(dI=0){
       //do Nothing; 
@@ -174,7 +163,11 @@ else{
   depressionClock = millis(); 
   }
 }
-outPut=constrain(MPPT_Targ,3.65,10.4); 
+
+outPut=constrain(MPPT_Targ,min_Gate,10.4); 
+if(outPut>min_Gate){
+  min_Gate = outPut; 
+}
 
 vBus_Last = vBus; 
 iBus_Last = iBus; 
@@ -203,6 +196,8 @@ void writeParams(){
     Serial.println(dI,9);
     Serial.print("dp: ");
     Serial.println(hold,9);
+    Serial.print("State:");
+    Serial.println(state);
   }
 }
 
@@ -254,7 +249,7 @@ void loop() {
   case 0:
     if(vBus>15){
       state = 1; 
-      analog_out.write(0,3.5);
+      analog_out.write(0,2.65);
       Serial.println("Out of Start Up State");
     }
     //Serial.println("Start Up State");
@@ -262,14 +257,38 @@ void loop() {
   case 1: // MPPT
     MPPT();
     analog_out.write(0,outPut);
-    // code block
+    if(vBus<5){
+      state = 3; 
+      Serial.println("BackFeed");
+      backfeedClock = millis();
+    }
+    else if(pBus>38){
+      state = 2;
+      Serial.println("Cut Out");
+    }
+ 
     break;
-  case 2: //Rated Power
-    break;
-  case 3: //Cut Out 
+  case 2: //Cut Out 
+    outPut = 10; 
+    analog_out.write(0,outPut);
+    if(vBus<5){
+      state = 3; 
+      Serial.println("BackFeed");
+      backfeedClock = millis();
+    }
     
     break; 
-  case 4: //BackFeed 
+  case 3: //BackFeed 
+    analog_out.write(0,0);
+    digital_outputs.set(0, HIGH);
+    if((millis()-backfeedClock)>5000){
+       digital_outputs.set(0, LOW);
+       delay(1500);
+      if(vBus>5){
+        min_Gate = 2.65; 
+        state = 1;
+      }
+    }
   
    break;
   }
