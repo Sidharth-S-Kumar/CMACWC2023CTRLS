@@ -111,7 +111,7 @@ void controlLaw() {
   float dt = (float)(currentTime - previousTime)/1000.0; //time increment dt
   err = ratedPower-measPower; //computing the error
   err = constrain(err, errMin, errMax); //anti-integral windup 
-
+        
   //Proportional
   float comPI = Kpi*err; //proportional component
 
