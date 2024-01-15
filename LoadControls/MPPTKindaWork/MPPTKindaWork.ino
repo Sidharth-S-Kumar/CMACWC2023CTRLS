@@ -26,7 +26,7 @@ float setPoint=0;
 float dV,dI; 
 float vBus_Last = 0; 
 float iBus_Last = 0; 
-float delta = .005;
+float delta = .0085;
 float MPPT_Targ = 2.65; 
 float min_Gate = 2.65; 
 float hold;
@@ -108,7 +108,7 @@ void MPPT(){
  Serial.print("DI:");
  Serial.println(dI);*/
  
-if((millis()-depressionClock)>850){
+if((millis()-depressionClock)>750){
 if(dV=0){
     if(dI=0){
       //do Nothing; 
@@ -257,7 +257,7 @@ void loop() {
   case 1: // MPPT
     MPPT();
     analog_out.write(0,outPut);
-    if(vBus<5){
+    /*if((vBus<7.5)&&(iBus<.075)){
       state = 3; 
       Serial.println("BackFeed");
       backfeedClock = millis();
@@ -265,13 +265,13 @@ void loop() {
     else if(pBus>38){
       state = 2;
       Serial.println("Cut Out");
-    }
+    }*/
  
     break;
   case 2: //Cut Out 
     outPut = 10; 
     analog_out.write(0,outPut);
-    if(vBus<5){
+    if((vBus<7)&&(iBus<.075)){
       state = 3; 
       Serial.println("BackFeed");
       backfeedClock = millis();
@@ -279,15 +279,18 @@ void loop() {
     
     break; 
   case 3: //BackFeed 
-    analog_out.write(0,0);
-    digital_outputs.set(0, HIGH);
-    if((millis()-backfeedClock)>5000){
+    outPut=0; 
+    analog_out.write(0,outPut);
+    digital_outputs.set(0, 1);
+    if((millis()-backfeedClock)>4500){
        digital_outputs.set(0, LOW);
+       Serial.println("Digital Out Low");
        delay(1500);
-      if(vBus>5){
+      if(vBus>8){
         min_Gate = 2.65; 
         state = 1;
       }
+      backfeedClock=millis();
     }
   
    break;

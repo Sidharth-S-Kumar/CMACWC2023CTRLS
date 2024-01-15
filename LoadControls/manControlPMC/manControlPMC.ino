@@ -41,6 +41,12 @@ float vOffset = -0.23;
 float iConversion = 0.9363; //Converting from Volts to Amps
 float iOffset = -0.046;
 float n = 500; //Sampling for Averaging function
+float vK = 0.00086801; //voltage calibration constant
+float iK = 0.00018084; //current calibration constant
+float vB = -0.1718; //voltage calibration offset
+float iB = -0.0386; //current calibration offset
+
+
 
 void readParams(){
 float vSum, iSum = 0; 
@@ -48,12 +54,12 @@ float vSum, iSum = 0;
     float voltage_ch0,voltage_ch1; 
     for (int i = 0; i<n;i++){
       raw_voltage_ch0 = analog_in.read(0);
-      float voltage_ch0 = (((raw_voltage_ch0 * reference) / 65535 / res_divider)+busRes_dividerOffset) / busRes_divider;
-      vSum = voltage_ch0 + vSum;
+      voltage_ch0 = (raw_voltage_ch0 * vK) + vB;
+      vSum += voltage_ch0;
 
-      float raw_voltage_ch1 = analog_in.read(1);
-      float voltage_ch1 = (raw_voltage_ch1 * reference) / 65535 / res_divider;
-      iSum = voltage_ch1/iConversion + iSum; 
+      raw_voltage_ch1 = analog_in.read(1);
+      voltage_ch1 = (raw_voltage_ch1 * iK) + iB;
+      iSum += voltage_ch1; 
     }
     
       vBus = (vSum/(float)n)+vOffset; 
@@ -134,7 +140,7 @@ void loop() {
 
   readParams();
 
-  delay(5000);
+  delay(2500);
   //Maximum output value is 10.4V
 
 }
